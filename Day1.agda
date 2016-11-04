@@ -282,7 +282,8 @@ module Explanation-of-≡ where
 --
 
 double-negate-elimination : ∀ (b : 𝔹) → neg (neg b) ≡ b
-double-negate-elimination b = {!!}
+double-negate-elimination true = refl
+double-negate-elimination false = refl
 
 -- ======================================
 -- Exercise: 1 star (and, or, xor, imply)
@@ -291,16 +292,28 @@ double-negate-elimination b = {!!}
 -- ======================================
 
 and : 𝔹 → 𝔹 → 𝔹
-and b₁ b₂ = {!!}
+and true true = true
+and true false = false
+and false true = false
+and false false = false
 
 or : 𝔹 → 𝔹 → 𝔹
-or b₁ b₂ = {!!}
+or true true = true
+or true false = true
+or false true = true
+or false false = false
 
 xor : 𝔹 → 𝔹 → 𝔹
-xor b₁ b₂ = {!!}
+xor true true = false
+xor true false = true
+xor false true = true
+xor false false = false
 
 imply : 𝔹 → 𝔹 → 𝔹
-imply b₁ b₂ = {!!}
+imply true true = true
+imply true false = false
+imply false true = true
+imply false false = true
 
 --
 -- 関数が書けたら、確認として以下の定理を証明してください。
@@ -309,28 +322,28 @@ imply b₁ b₂ = {!!}
 --
 
 check-and₁ : and true false ≡ false
-check-and₁ = {!!}
+check-and₁ = refl
 
 check-and₂ : and true true ≡ true
-check-and₂ = {!!}
+check-and₂ = refl
 
 check-or₁ : or false true ≡ true
-check-or₁ = {!!}
+check-or₁ = refl
 
 check-or₂ : or false false ≡ false
-check-or₂ = {!!}
+check-or₂ = refl
 
 check-xor₁ : xor false true ≡ true
-check-xor₁ = {!!}
+check-xor₁ = refl
 
 check-xor₂ : xor false false ≡ false
-check-xor₂ = {!!}
+check-xor₂ = refl
 
 check-imply₁ : imply true false ≡ false
-check-imply₁ = {!!}
+check-imply₁ = refl
 
 check-imply₂ : imply false false ≡ true
-check-imply₂ = {!!}
+check-imply₂ = refl
 
 -- ===================================
 -- Exercise: 2 star (ド・モルガンの法則)
@@ -342,24 +355,38 @@ check-imply₂ = {!!}
 --
 
 de-morgan-law₁ : ∀ b c → neg (or b c) ≡ and (neg b) (neg c)
-de-morgan-law₁ b c = {!!}
+de-morgan-law₁ true true = refl
+de-morgan-law₁ true false = refl
+de-morgan-law₁ false true = refl
+de-morgan-law₁ false false = refl
 
 de-morgan-law₂ : ∀ b c → neg (and b c) ≡ or (neg b) (neg c)
-de-morgan-law₂ b c = {!!}
+de-morgan-law₂ true true = refl
+de-morgan-law₂ true false = refl
+de-morgan-law₂ false true = refl
+de-morgan-law₂ false false = refl
 
 -- =========================
 -- Exercise: 2 star (排中律)
 -- =========================
 
 excluded-middle : ∀ a → or a (neg a) ≡ true
-excluded-middle a = {!!}
+excluded-middle true = refl
+excluded-middle false = refl
 
 -- =============================
 -- Exercise: 2 star (恒真命題の例)
 -- =============================
 
 tautology : ∀ a b c → imply (and (imply a b) (imply b c)) (imply a c) ≡ true
-tautology a b c = {!!}
+tautology true true true = refl
+tautology true true false = refl
+tautology true false true = refl
+tautology true false false = refl
+tautology false true true = refl
+tautology false true false = refl
+tautology false false true = refl
+tautology false false false = refl
 
 --
 -- C-c C-c のコマンドは、場合分けの対象を複数受け付けることができます。
@@ -408,7 +435,7 @@ three = suc (suc (suc zero))
 -- ========================
 
 seven : ℕ
-seven = {!!}
+seven = suc (suc (suc (suc (suc (suc (suc zero))))))
 
 --
 -- この定義のもとで、自然数同士の足し算は次のように定義されます。
@@ -450,7 +477,7 @@ if false then x else y = y
 --
 -- _+_ の定義にしたがうと、2 + 1 は以下のように計算されます。
 -- 2 がどのように変化しているかに注目してください。
--- 
+--
 --    suc (suc zero) + suc zero = suc (suc zero + suc zero)
 --   ^^^^^^^^^^^^^                    ^^^^^^^^
 --                              = suc (suc (zero + suc zero)
@@ -472,7 +499,7 @@ if false then x else y = y
 -- =============================================================
 
 0+n≡n : ∀ n → zero + n ≡ n
-0+n≡n n = {!!}
+0+n≡n n = refl
 
 -- #
 -- # ちょっと寄り道: 命題の名前について
@@ -487,7 +514,8 @@ if false then x else y = y
 -- ============================================================
 
 n+0≡n-first-attempt : ∀ n → n + zero ≡ n
-n+0≡n-first-attempt n = {!!}
+n+0≡n-first-attempt zero = refl
+n+0≡n-first-attempt (suc n) = {!!}
 
 --
 -- ここでは、ある自然数 n に右から 0 を足した結果は n に等しいことを証明します。
@@ -504,7 +532,7 @@ n+0≡n-first-attempt n = {!!}
 -- まず、自然言語による証明を考えてみましょう。
 --
 --    n + zero が n に等しいことを n に関する場合分けで証明する。
---   
+--
 --    n = zero の場合
 --      zero + zero は zero と計算されるので、この場合はOK
 --
@@ -519,7 +547,7 @@ n+0≡n-first-attempt n = {!!}
 -- 自然数に関する帰納法の原理を用いると、この命題が証明できます。
 --
 --    n + zero が n に等しいことを n に関する帰納法で証明する。
--- 
+--
 --    n = zero の場合
 --      zero + zero は zero と計算されるので、この場合はOK
 --
@@ -536,7 +564,7 @@ n+0≡n-first-attempt n = {!!}
 -- ときに suc n と suc m が等しいことを証明してみましょう。
 --
 -- まず、命題は次のように書けます。
---    
+--
 --    cong-suc : ∀ n m → n ≡ m → suc n ≡ suc m
 --    cong-suc n m eq = {!!}
 --
@@ -551,7 +579,7 @@ n+0≡n-first-attempt n = {!!}
 -- あった場所は refl で置き換わります。refl というコンストラクタが存在する場合、
 -- n と m は同じものであることが要求されます。実際、次のプログラムをロード
 -- すると型検査に失敗しエラーになります。
--- 
+--
 --    cong-suc : ∀ n m → n ≡ m → suc n ≡ suc m
 --    cong-suc n m refl = {!!}
 --
@@ -567,10 +595,10 @@ n+0≡n-first-attempt n = {!!}
 -- 結果として m の場所には .n が来ることになります。
 --
 -- 以下の補題を証明してください。
--- 
+--
 
 cong-suc : ∀ n m → n ≡ m → suc n ≡ suc m
-cong-suc n m eq = {!!}
+cong-suc n .n refl = refl
 
 --
 -- Agda では、帰納法の仮定を用いることは再帰することに対応します。
@@ -594,7 +622,8 @@ n+0≡n (suc n) =
 -- ===================================================
 
 +-assoc : ∀ n m o → n + m + o ≡ n + (m + o)
-+-assoc = {!!}
++-assoc zero m o = refl
++-assoc (suc n) m o = cong-suc (n + m + o) (n + (m + o)) (+-assoc n m o)
 
 --
 -- a ≡ b ならば b ≡ a である、というのも証明すべき命題です。
@@ -655,12 +684,12 @@ symmetric₂ {a} {.a} refl = refl
 -- 証明を次のステップに進めることができます。まず、穴のなかに symmetric と
 -- 書きます。つづいて、カーソルはそのままで C-c C-r と入力します。
 -- 動画: https://gyazo.com/46871f07c66cf7c14cac7a553b5cb6a5
--- 
+--
 --    n≡n+0 : ∀ n → n ≡ n + zero
 --    n≡n+0 n = symmetric {!!}
 --
 -- この操作によって証明が進み、Goal が次のように変化します。
--- 
+--
 --    Goal: n + zero ≡ n
 --    ————————————————————————————————————————————————————————————
 --    n : ℕ
@@ -672,7 +701,7 @@ symmetric₂ {a} {.a} refl = refl
 --
 
 n≡n+0 : ∀ n → n ≡ n + zero
-n≡n+0 n = {!!}
+n≡n+0 n = symmetric (n+0≡n n)
 
 -- =====================================================================
 -- Exercise: 2 star (transitivity)
@@ -681,7 +710,7 @@ n≡n+0 n = {!!}
 -- =====================================================================
 
 transitive : ∀ {a b c : ℕ} → a ≡ b → b ≡ c → a ≡ c
-transitive a≡b b≡c = {!!}
+transitive refl refl = refl
 
 -- ======================================================================
 -- Exercise: 3 star (_+_ の交換法則)
@@ -690,11 +719,13 @@ transitive a≡b b≡c = {!!}
 -- ======================================================================
 
 sm+n≡m+sn : ∀ m n → suc m + n ≡ m + suc n
-sm+n≡m+sn m n = {!!}
+sm+n≡m+sn zero zero = refl
+sm+n≡m+sn zero (suc n) = refl
+sm+n≡m+sn (suc m) n = cong-suc (suc m + n) (m + suc n) (sm+n≡m+sn m n)
 
 +-comm : ∀ n m → n + m ≡ m + n
-+-comm zero    m = {!!}
-+-comm (suc n) m = {!!}
++-comm zero    m = n≡n+0 m
++-comm (suc n) m = transitive (cong-suc (n + m) (m + n) (+-comm n m)) (sm+n≡m+sn m n)
 
 --
 -- § 2.3 関係の定義、及び関係に関する帰納法
