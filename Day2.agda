@@ -149,7 +149,7 @@ sm+n≡m+sn (suc m) n = cong suc (sm+n≡m+sn m n)
 
 +-comm₁ : ∀ n m → n + m ≡ m + n
 +-comm₁ zero    m = n+0≡0 m
-+-comm₁ (suc n) m = {!!}
++-comm₁ (suc n) m rewrite +-comm₁ n m | sm+n≡m+sn m n = refl
 
 --
 -- ここでは rewrite によって証明がほぼ完了してしまいましたが、実際には

@@ -391,7 +391,7 @@ tautology false false false = refl
 --
 -- C-c C-c のコマンドは、場合分けの対象を複数受け付けることができます。
 -- 動画: https://gyazo.com/0270c7e3653b0e3f8f9f28c753635aa1
--- 
+--
 
 --
 --
@@ -749,16 +749,19 @@ data _≤_ : ℕ → ℕ → Set where
 -- ===================================
 
 0≤1 : zero ≤ one
-0≤1 = {!!}
+0≤1 = z≤m (suc zero)
 
 0≤2 : zero ≤ two
-0≤2 = {!!}
+0≤2 = z≤m (suc (suc zero))
 
 1≤2 : one ≤ two
-1≤2 = {!!}
+1≤2 = s≤s zero (suc zero) (z≤m (suc zero))
 
 4≤7 : four ≤ seven -- めんどくさかったら C-c C-a で
-4≤7 = {!!}
+4≤7 = s≤s (suc (suc (suc zero))) (suc (suc (suc (suc (suc (suc zero))))))
+        (s≤s (suc (suc zero)) (suc (suc (suc (suc (suc zero)))))
+         (s≤s (suc zero) (suc (suc (suc (suc zero))))
+          (s≤s zero (suc (suc (suc zero))) (z≤m (suc (suc (suc zero)))))))
 
 -- ==========================================================
 -- Exercise: 3 star (n は n 以上)
@@ -766,14 +769,15 @@ data _≤_ : ℕ → ℕ → Set where
 -- ==========================================================
 
 n≤n : ∀ {n} → n ≤ n
-n≤n {n = n} = {!!}
+n≤n {zero} = z≤m zero
+n≤n {suc n} = s≤s n n (n≤n {n})
 
 --
 -- 次の命題を考えてみましょう。
 --
 --    n≤m⇒n≤sm : ∀ {n m} → n ≤ m → n ≤ suc m
 --    n≤m⇒n≤sm = ?
--- 
+--
 -- この命題に関しては、実は n (と m) に関する帰納法ではなく、仮定として
 -- 使う事ができる、n ≤ m という関係に関する帰納法を使った方が簡単に証明
 -- できます。まず自然言語による証明を考えてみます。
@@ -803,7 +807,8 @@ n≤n {n = n} = {!!}
 --
 
 n≤m⇒n≤sm : ∀ {n m} → n ≤ m → n ≤ suc m
-n≤m⇒n≤sm n≤m = {!!}
+n≤m⇒n≤sm (z≤m m) = z≤m (suc m)
+n≤m⇒n≤sm (s≤s n m n≤m) = s≤s n (suc m) (n≤m⇒n≤sm {n} {m} n≤m)
 
 --
 -- ところで、関係 _≤_ は次のようにも定義できます。以下の定義 _≤′_ と
@@ -820,16 +825,21 @@ data _≤′_ : ℕ → ℕ → Set where
 -- ===================================
 
 0≤′1 : zero ≤′ one
-0≤′1 = {!!}
+0≤′1 = ≤′-step zero zero (≤′-refl zero)
 
 0≤′2 : zero ≤′ two
-0≤′2 = {!!}
+0≤′2 = ≤′-step zero (suc zero) (≤′-step zero zero (≤′-refl zero))
 
 1≤′2 : one ≤′ two
-1≤′2 = {!!}
+1≤′2 = ≤′-step (suc zero) (suc zero) (≤′-refl (suc zero))
 
 4≤′7 : four ≤′ seven -- めんどくさかったら C-c C-a で
-4≤′7 = {!!}
+4≤′7 = ≤′-step (suc (suc (suc (suc zero))))
+          (suc (suc (suc (suc (suc (suc zero))))))
+          (≤′-step (suc (suc (suc (suc zero))))
+           (suc (suc (suc (suc (suc zero)))))
+           (≤′-step (suc (suc (suc (suc zero)))) (suc (suc (suc (suc zero))))
+            (≤′-refl (suc (suc (suc (suc zero)))))))
 
 -- ===========================================================
 -- Exercise: 3 star (0 ≤′ n)
@@ -838,7 +848,8 @@ data _≤′_ : ℕ → ℕ → Set where
 -- ===========================================================
 
 0≤′n : ∀ {n} → zero ≤′ n
-0≤′n {n = n} = {!!}
+0≤′n {zero} = ≤′-refl zero
+0≤′n {suc n} = ≤′-step zero n 0≤′n
 
 -- =================================================================
 -- Exercise: 3 star (s≤s)
@@ -847,7 +858,8 @@ data _≤′_ : ℕ → ℕ → Set where
 -- =================================================================
 
 n≤′m⇒sn≤′sm : ∀ {n m} → n ≤′ m → suc n ≤′ suc m
-n≤′m⇒sn≤′sm n≤′m = {!!}
+n≤′m⇒sn≤′sm (≤′-refl m) = ≤′-refl (suc m)
+n≤′m⇒sn≤′sm (≤′-step n m n≤′m) = ≤′-step (suc n) (suc m) (n≤′m⇒sn≤′sm n≤′m)
 
 -- ==============================================================
 -- Exercise: 3 star (_≤_ と _≤′_ が等価であること)
@@ -855,8 +867,10 @@ n≤′m⇒sn≤′sm n≤′m = {!!}
 -- ==============================================================
 
 n≤m⇒n≤′m : ∀ {n m} → n ≤ m → n ≤′ m
-n≤m⇒n≤′m n≤m = {!!}
+n≤m⇒n≤′m (z≤m m) = 0≤′n
+n≤m⇒n≤′m (s≤s n m n≤m) = n≤′m⇒sn≤′sm (n≤m⇒n≤′m n≤m)
 
 n≤′m⇒n≤m : ∀ {n m} → n ≤′ m → n ≤ m
-n≤′m⇒n≤m n≤′m = {!!}
+n≤′m⇒n≤m (≤′-refl m) = n≤n
+n≤′m⇒n≤m (≤′-step n m n≤′m) = n≤′m⇒n≤m (≤′-step n m n≤′m)
 
