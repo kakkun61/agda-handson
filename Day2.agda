@@ -148,7 +148,7 @@ sm+n≡m+sn (suc m) n = cong suc (sm+n≡m+sn m n)
 --
 
 +-comm₁ : ∀ n m → n + m ≡ m + n
-+-comm₁ zero    m = n+0≡0 m
++-comm₁ zero    m = n≡n+0 m
 +-comm₁ (suc n) m rewrite +-comm₁ n m | sm+n≡m+sn m n = refl
 
 --
@@ -253,7 +253,25 @@ open SemiringSolver
 --
 
 +-assoc : ∀ n m o → n + m + o ≡ n + (m + o)
-+-assoc = {!!}
+--+-assoc n m zero rewrite n̄≡n+0 (n+m) | n≡n+0 m = {!!}
++-assoc n m zero = begin
+  n + m + zero
+    ≡⟨ sym (n≡n+0 (n + m)) ⟩
+  n + m
+    ≡⟨ cong (\x -> n + x) (n≡n+0 m) ⟩
+  n + (m + zero)
+    ∎
++-assoc n m (suc o) = begin
+  n + m + (suc o)
+    ≡⟨ sym (sm+n≡m+sn (n + m) o) ⟩
+  suc (n + m + o)
+    ≡⟨ cong suc (+-assoc n m o) ⟩
+  (suc n) + (m + o)
+    ≡⟨ sm+n≡m+sn n (m + o) ⟩
+  n + (suc (m + o))
+    ≡⟨ cong (\x -> n + x) (sm+n≡m+sn m o) ⟩
+  n + (m + suc o)
+    ∎
 
 --
 -- 2.
