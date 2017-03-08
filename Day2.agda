@@ -272,6 +272,15 @@ open SemiringSolver
     ≡⟨ cong (\x -> n + x) (sm+n≡m+sn m o) ⟩
   n + (m + suc o)
     ∎
++-assoc′ : ∀ n m o → n + m + o ≡ n + (m + o)
++-assoc′ n m zero
+  rewrite sym (n≡n+0 m)
+        | sym (n≡n+0 (n + m)) = refl
++-assoc′ n m (suc o)
+  rewrite sym (sm+n≡m+sn (n + m) o)
+        | +-assoc′ n m o
+        | sm+n≡m+sn n (m + o)
+        | sm+n≡m+sn m o = refl
 
 --
 -- 2.
@@ -286,13 +295,16 @@ open SemiringSolver
 --
 
 n*0≡0 : ∀ n → n * zero ≡ zero
-n*0≡0 = {!!}
+n*0≡0 zero = refl
+n*0≡0 (suc n) = n*0≡0 n
 
 n*1≡n : ∀ n → n * 1 ≡ n
-n*1≡n = {!!}
+n*1≡n zero = refl
+n*1≡n (suc n) = cong suc (n*1≡n n)
 
 n*2≡n+n : ∀ n → n * 2 ≡ n + n
-n*2≡n+n = {!!}
+n*2≡n+n zero = refl
+n*2≡n+n (suc n) rewrite sym (sm+n≡m+sn n n) = cong suc (cong suc (n*2≡n+n n))
 
 m*sn≡m+m*n : ∀ m n → m * (suc n) ≡ m + m * n
 m*sn≡m+m*n = {!!}
