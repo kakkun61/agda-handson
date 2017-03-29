@@ -307,13 +307,66 @@ n*2≡n+n zero = refl
 n*2≡n+n (suc n) rewrite sym (sm+n≡m+sn n n) = cong suc (cong suc (n*2≡n+n n))
 
 m*sn≡m+m*n : ∀ m n → m * (suc n) ≡ m + m * n
-m*sn≡m+m*n = {!!}
+m*sn≡m+m*n zero n = refl
+m*sn≡m+m*n (suc m) n = begin
+  (suc m) * (suc n)
+    ≡⟨ refl ⟩
+  suc (n + m * suc n)
+    ≡⟨ cong (λ x → suc (n + x)) (m*sn≡m+m*n m n) ⟩
+  suc (n + (m + m * n))
+    ≡⟨ cong suc (sym (+-assoc n m (m * n))) ⟩
+  suc (n + m + m * n)
+    ≡⟨ cong (λ x → suc (x + m * n)) (+-comm n m) ⟩
+  suc (m + n + m * n)
+    ≡⟨ cong suc (+-assoc m n (m * n)) ⟩
+  suc (m + (n + m * n))
+    ≡⟨ refl ⟩
+  (suc m) + (suc m) * n
+    ∎
 
 *-comm : ∀ n m → n * m ≡ m * n
-*-comm = {!!}
+*-comm n zero = n*0≡0 n
+*-comm n (suc m) = begin
+  n * suc m
+    ≡⟨ m*sn≡m+m*n n m ⟩
+  n + n * m
+    ≡⟨ cong (λ x → n + x) (*-comm n m) ⟩
+  n + m * n
+    ∎
 
 *-distrib-+₁ : ∀ n m o → (n + m) * o ≡ n * o + m * o
-*-distrib-+₁ = {!!}
+*-distrib-+₁ n m zero = begin
+  (n + m) * zero
+    ≡⟨ n*0≡0 (n + m) ⟩
+  zero
+    ≡⟨ refl ⟩
+  zero + zero
+    ≡⟨ cong (λ x → x + zero) (sym (n*0≡0 n)) ⟩
+  n * zero + zero
+    ≡⟨ cong (λ x → n * zero + x) (sym (n*0≡0 m)) ⟩
+  n * zero + m * zero
+    ∎
+*-distrib-+₁ n m (suc o) = begin
+  (n + m) * suc o
+    ≡⟨ m*sn≡m+m*n ((n + m)) o ⟩
+  (n + m) + (n + m) * o
+    ≡⟨ cong (λ x → n + m + x) (*-distrib-+₁ n m o) ⟩
+  (n + m) + (n * o + m * o)
+    ≡⟨ sym (+-assoc (n + m) (n * o) (m * o)) ⟩
+  (n + m) + n * o + m * o
+    ≡⟨ cong (λ x → x + m * o) (+-assoc n m (n * o)) ⟩
+  n + (m + n * o) + m * o
+    ≡⟨ cong (λ x → n + x + m * o) (+-comm m (n * o)) ⟩
+  n + (n * o + m) + m * o
+    ≡⟨ cong (λ x → x + m * o) (sym (+-assoc n (n * o) m)) ⟩
+  (n + n * o) + m + m * o
+    ≡⟨ cong (λ x → x + m + m * o) (sym (m*sn≡m+m*n n o)) ⟩
+  (n * suc o) + m + m * o
+    ≡⟨ +-assoc (n * suc o) m (m * o) ⟩
+  (n * suc o) + (m + m * o)
+    ≡⟨ cong (λ x → n * suc o + x) (sym (m*sn≡m+m*n m o)) ⟩
+  n * suc o + m * suc o
+    ∎
 
 *-distrib-+₂ : ∀ n m o → n * (m + o) ≡ n * m + n * o
 *-distrib-+₂ = {!!}
