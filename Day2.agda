@@ -369,7 +369,30 @@ m*sn≡m+m*n (suc m) n = begin
     ∎
 
 *-distrib-+₂ : ∀ n m o → n * (m + o) ≡ n * m + n * o
-*-distrib-+₂ = {!!}
+*-distrib-+₂ zero m o = refl
+*-distrib-+₂ (suc n) m o = begin
+  m + o + n * (m + o)
+    ≡⟨ cong (λ x → m + o + x) (*-distrib-+₂ n m o) ⟩
+  m + o + (n * m + n * o)
+    ≡⟨ sym (+-assoc (m + o) (n * m) (n * o)) ⟩
+  m + o + n * m + n * o
+    ≡⟨ cong (λ x → x + n * o) (+-assoc m o (n * m)) ⟩
+  m + (o + n * m) + n * o
+    ≡⟨ cong (λ x → m + x + n * o) (+-comm o (n * m)) ⟩
+  m + (n * m + o) + n * o
+    ≡⟨ cong (λ x → x + n * o) (sym (+-assoc m (n * m) o)) ⟩
+  m + n * m + o + n * o
+    ≡⟨ +-assoc (m + n * m) o (n * o) ⟩
+  m + n * m + (o + n * o)
+    ∎
 
 expand : ∀ a b c d → (a + b) * (c + d) ≡ (a * c + b * c) + (a * d + b * d)
-expand = {!!}
+expand a b c d = begin
+  (a + b) * (c + d)
+    ≡⟨ *-distrib-+₂ (a + b) c d  ⟩
+  (a + b) * c + (a + b) * d
+    ≡⟨ cong (λ x → x + (a + b) * d) (*-distrib-+₁ a b c) ⟩
+  a * c + b * c + (a + b) * d
+    ≡⟨ cong (λ x → a * c + b * c + x) (*-distrib-+₁ a b d) ⟩
+  a * c + b * c + (a * d + b * d)
+    ∎
