@@ -106,28 +106,22 @@ rev-involutive : ∀ {A : Set} (xs : List A) → rev (rev xs) ≡ xs
 rev-involutive [] = refl
 rev-involutive (x ∷ xs) = begin
   rev (rev xs ++ x ∷ [])
-    ≡⟨ lemma xs (x ∷ []) ⟩
+    ≡⟨ lemma (rev xs) (x ∷ []) ⟩
   x ∷ (rev (rev xs))
     ≡⟨ cong (λ a → x ∷ a) (rev-involutive xs) ⟩
   x ∷ xs
     ∎
   where
-    lemma : ∀ {A : Set} (xs : List A) (ys : List A) → rev (rev xs ++ ys) ≡ rev ys ++ rev (rev xs)
+    lemma : ∀ {A : Set} (xs : List A) (ys : List A) → rev (xs ++ ys) ≡ rev ys ++ rev xs
     lemma [] ys = sym (app-nil (rev ys))
-    lemma (x₁ ∷ xs₁) ys = begin
-      rev ((rev xs₁ ++ x₁ ∷ []) ++ ys)
-        ≡⟨ cong (λ a → rev a) (sym (app-assoc (rev xs₁) (x₁ ∷ []) ys)) ⟩
-      rev (rev xs₁ ++ x₁ ∷ ys)
-        ≡⟨ lemma xs₁ (x₁ ∷ ys) ⟩
-      rev (x₁ ∷ ys) ++ rev (rev xs₁)
-        ≡⟨ refl ⟩
-      (rev ys ++ x₁ ∷ []) ++ rev (rev xs₁)
-        ≡⟨ sym (app-assoc (rev ys) (x₁ ∷ []) (rev (rev xs₁))) ⟩
-      rev ys ++ (x₁ ∷ []) ++ rev (rev xs₁)
-        ≡⟨ cong (λ a → rev ys ++ a) (sym (lemma xs₁ (x₁ ∷ []))) ⟩
-      rev ys ++ rev (rev xs₁ ++ x₁ ∷ [])
+    lemma (x ∷ xs₁) ys = begin
+      rev (x ∷ xs₁ ++ ys)
+        ≡⟨ cong (λ a → a ++ x ∷ []) (lemma xs₁ ys) ⟩
+      (rev ys ++ rev xs₁) ++ x ∷ []
+        ≡⟨ sym (app-assoc (rev ys) (rev xs₁) (x ∷ [])) ⟩
+      rev ys ++ rev (x ∷ xs₁)
         ∎
-r
+
 -- ==================================================================
 -- Exercise: (5 star) rev-injective
 -- rev が単射であることを証明してください。素直にやろうとすると難しいですが、
