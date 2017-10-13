@@ -44,7 +44,7 @@ data 𝔹 : Set where  -- 𝔹 というデータ型を宣言する (𝔹 は \b
 -- #    C-u C-x = とコマンドを打つと、以下のようなヘルプがウィンドウに表示
 -- #    されます。この中の to input: というところを見ると、その文字をタイプする
 -- #    ためのコマンドを知ることができます。
--- #
+- #
 -- #              position: 795 of 15864 (5%), column: 42
 -- #             character: 𝔹 (displayed as 𝔹) (codepoint 120121, #o352471, #x1d539)
 -- #     preferred charset: unicode (Unicode (ISO10646))

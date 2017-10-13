@@ -59,15 +59,17 @@ data ⊥ : Set where
 -- ==================================================================
 
 no-even : ∀ k → ¬ Even (k * 2 + 1)
-no-even = {!!}
-  
+no-even zero ()
+no-even (suc k) (e-suc x) = no-even k x
+
 -- ==================================================================
 -- Exercise: no-odd (★★)
 -- 任意の自然数 k について k * 2 が奇数ではないことを証明してください。
 -- ==================================================================
 
 no-odd : ∀ k → ¬ Odd (k * 2)
-no-odd = {!!}
+no-odd zero ()
+no-odd (suc k) (o-suc x) = no-odd k x
 
 --
 -- 2つの型の組を作るレコード型 _×_ は次のように定義されます。この _×_ は
@@ -108,7 +110,9 @@ record _×_ (A : Set) (B : Set) : Set where
 -- ==================================================================
 
 no-eo : ∀ k → ¬ (Even k × Odd k)
-no-eo = {!!}
+no-eo zero (e-zero , ())
+no-eo (suc zero) (() , _)
+no-eo (suc (suc k)) (e-suc e , o-suc o) = no-eo k (e , o)
 
 --
 -- 引数をうまく使って ⊥ が作れるとき、absurd pattern と with pattern を
@@ -125,7 +129,8 @@ pnnp p np with np p
 -- ==================================================================
 
 cp : ∀ {P Q R : Set} → (P → Q) → (Q → ⊥) → P → R
-cp = {!!}
+cp pq qb p with qb (pq p)
+... | ()
 
 -- ==================================================================
 -- Exercise: dne (★★★)
@@ -133,7 +138,13 @@ cp = {!!}
 -- ==================================================================
 
 dne : ∀ {P Q : Set} → (((P → ⊥) → ⊥) → ⊥) → P → Q
-dne = {!!}
+dne a p with a (λ x → x p)
+... | ()
+
+-- a : ((P → ⊥) → ⊥) → ⊥
+-- λx → ⋯ : (P → ⊥) → ⊥
+-- x : P → ⊥
+-- (((P → ⊥) → ⊥) → ⊥) ≡ ¬ (¬ (¬ P))
 
 --
 -- 論理積に対応する型は _×_ でしたが、一方論理和に対応する型は次のように
@@ -173,7 +184,13 @@ eo-two = inj₁ (e-suc e-zero)
 -- ==================================================================
 
 eo-k : ∀ k → Even k ⊎ Odd k
-eo-k = {!!}
+eo-k zero = inj₁ e-zero
+eo-k (suc zero) = inj₂ o-one
+eo-k (suc (suc k)) = add2 (eo-k k)
+  where
+    add2 : ∀ {k} → Even k ⊎ Odd k → Even (suc (suc k)) ⊎ Odd (suc (suc k))
+    add2 (inj₁ e) = inj₁ (e-suc e)
+    add2 (inj₂ o) = inj₂ (o-suc o)
 
 -- ==================================================================
 -- Exercise: classic (★★)
@@ -181,7 +198,8 @@ eo-k = {!!}
 -- ==================================================================
 
 classic : ∀ {P : Set} → P ⊎ (P → ⊥) → ((P → ⊥) → ⊥) → P
-classic = {!!}
+classic (inj₁ p) not-not-p = p
+classic (inj₂ not-p) not-not-p = ⊥-elim (not-not-p not-p)
 
 -- ==================================================================
 -- Exercise: loem (★★★)
@@ -189,7 +207,7 @@ classic = {!!}
 -- ==================================================================
 
 loem : ∀ {P Q : Set} → ((P ⊎ (P → ⊥)) → ⊥) → Q
-loem = {!!}
+loem x = ⊥-elim (x (inj₂ (λ x₁ → x (inj₁ x₁))))
 
 -- ==================================================================
 -- Exercise: mh-id (★★★)
@@ -198,4 +216,15 @@ loem = {!!}
 -- ==================================================================
 
 mh-id : ∀ p q → manhattan p q ≡ 0 → p ≡ q
-mh-id = {!!}
+mh-id record { x = x₀ ; y = y₀ } record { x = x₁ ; y = y₁ } e = {!!}
+
+mh₀-id : ∀ p q → manhattan₀ p q ≡ 0 → p ≡ q
+mh₀-id zero zero _ = refl
+mh₀-id zero (suc q) ()
+mh₀-id (suc p) zero ()
+mh₀-id (suc p) (suc q) e = cong suc (mh₀-id p q e)
+
+mh0→mh₀0 : ∀ p q → manhattan p q ≡ 0 → manhattan₀ (Point.x p) (Point.x q) ≡ 0 × manhattan₀ (Point.y p) (Point.y q) ≡ 0
+mh0→mh₀0 record { x = zero ; y = zero } record { x = zero ; y = zero } e = refl , refl
+mh0→mh₀0 record { x = zero ; y = y₀ } record { x = x₁ ; y = y₁ } e = {!!}
+mh0→mh₀0 record { x = (suc x₀) ; y = y₀ } record { x = x₁ ; y = y₁ } e = {!!}

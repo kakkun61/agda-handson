@@ -130,11 +130,19 @@ rev-involutive (x ∷ xs) = begin
 -- ==================================================================
 
 rev-injective : ∀ {A : Set} (xs ys : List A) → rev xs ≡ rev ys → xs ≡ ys
-rev-injective = {!!}
+rev-injective xs ys x = begin
+  xs
+    ≡⟨ sym (rev-involutive xs) ⟩
+  rev (rev xs)
+    ≡⟨ cong rev x ⟩
+  rev (rev ys)
+    ≡⟨ rev-involutive ys ⟩
+  ys
+    ∎
 
 --
 -- § 3.2 With-Abstraction
--- 
+--
 -- わからないところがあったら
 -- http://agda.readthedocs.io/en/latest/language/with-abstraction.html
 -- を参照してください
@@ -210,5 +218,12 @@ filter′ f (x ∷ xs) with f x
 
 filter-app : ∀ {A : Set} (f : A → Bool) (xs ys : List A)
              → filter f (xs ++ ys) ≡ filter f xs ++ filter f ys
-filter-app f xs ys = {!!}
+filter-app f [] ys = refl
+filter-app f (x ∷ xs) ys with f x
+... | true = begin
+      x ∷ filter f (xs ++ ys)
+        ≡⟨ cong (λ a → x ∷ a) (filter-app f xs ys) ⟩
+      x ∷ filter f xs ++ filter f ys
+        ∎
+... | false = filter-app f xs ys
 

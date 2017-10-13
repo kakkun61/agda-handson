@@ -6,6 +6,8 @@ open import Data.Nat.Properties
 open import Data.Nat.Properties.Simple
 open import Relation.Binary.PropositionalEquality
 
+open ≡-Reasoning
+
 --
 -- § 4. レコード型
 --
@@ -69,19 +71,43 @@ p₁ = 1 , 2
 --   まず一次元のマンハッタン距離を求める関数を定義してください。
 -- ==================================================================
 
+mht1 : ℕ → ℕ → ℕ
+mht1 zero y = y
+mht1 (suc x) zero = suc x
+mht1 (suc x) (suc y) = mht1 x y
+
 manhattan : Point → Point → ℕ
-manhattan = {!!}
+manhattan p q = mht1 (Point.x p) (Point.x q) + mht1 (Point.y p) (Point.y q)
 
 -- ==================================================================
--- Exercise: manhattan (★★★)
+-- exercise: manhattan (★★★)
 -- マンハッタン距離が対称的であることを証明してください。
 -- ==================================================================
 
+x≡mht1x0 : ∀ x → x ≡ mht1 x zero
+x≡mht1x0 zero = refl
+x≡mht1x0 (suc x) = refl
+
+mht1-sym : ∀ x y → mht1 x y ≡ mht1 y x
+mht1-sym zero y = x≡mht1x0 y
+mht1-sym (suc x) zero = refl
+mht1-sym (suc x) (suc y) = mht1-sym x y
+
 mh-sym : ∀ p q → manhattan p q ≡ manhattan q p
-mh-sym = {!!}
+mh-sym p q = begin
+  manhattan p q
+    ≡⟨ refl ⟩
+  mht1 (Point.x p) (Point.x q) + mht1 (Point.y p) (Point.y q)
+    ≡⟨ cong (λ x → x + mht1 (Point.y p) (Point.y q)) (mht1-sym (Point.x p) (Point.x q)) ⟩
+  mht1 (Point.x q) (Point.x p) + mht1 (Point.y p) (Point.y q)
+    ≡⟨ cong (λ x → mht1 (Point.x q) (Point.x p) + x) (mht1-sym (Point.y p) (Point.y q)) ⟩
+  mht1 (Point.x q) (Point.x p) + mht1 (Point.y q) (Point.y p)
+    ≡⟨ refl ⟩
+  manhattan q p
+    ∎
 
 -- ==================================================================
--- Exercise: tri-ineq (★★★★)
+-- exercise: tri-ineq (★★★★)
 -- マンハッタン距離が三角不等式を満たすことを証明してください。ただし、この
 -- 問題は面倒な上にレコード型の理解にあまり寄与しないので、スキップすることを
 -- 推奨します。
@@ -129,7 +155,9 @@ record Even-number : Set where
 -- ==================================================================
 
 twice-e : ℕ → Even-number
-twice-e = {!!}
+twice-e zero = zero even-by e-zero
+twice-e (suc x) = suc (suc (Even-number.n twice-x)) even-by e-suc (Even-number.n-even twice-x)
+  where twice-x = twice-e x
 
 -- ==================================================================
 -- Exercise: add-ee (★★)
@@ -137,8 +165,13 @@ twice-e = {!!}
 -- 返り値の型は Even-number であるようにしてください。
 -- ==================================================================
 
+add-even : ∀ {n m} → Even n → Even m → Even (n + m)
+add-even e-zero evenₘ                = evenₘ
+add-even (e-suc evenₙ) e-zero        = e-suc (add-even evenₙ e-zero)
+add-even (e-suc evenₙ) (e-suc evenₘ) = e-suc (add-even evenₙ (e-suc evenₘ))
+
 add-ee : Even-number → Even-number → Even-number
-add-ee = {!!}
+add-ee (n₁ even-by n-even₁) (n₂ even-by n-even₂) = (n₁ + n₂) even-by add-even n-even₁ n-even₂
 
 -- ==================================================================
 -- Exercise: add-eo (★★★)
@@ -147,14 +180,20 @@ add-ee = {!!}
 -- 定義してください。
 -- ==================================================================
 
---
--- data Odd : ℕ → Set where
---   ...
---
---
--- record Odd-number : Set where
---   ...
---
--- add-eo : Even-number → Odd-number → Odd-number
--- add-eo = ?
---
+data Odd : ℕ → Set where
+  o-one : Odd (suc zero)
+  o-suc : ∀ {n} → Odd n → Odd (suc (suc n))
+
+record Odd-number : Set where
+  constructor _odd-by_
+  field
+    n     : ℕ
+    n-odd : Odd n
+
+add-even-odd : ∀ {n m} → Even n → Odd m → Odd (n + m)
+add-even-odd e-zero m             = m
+add-even-odd (e-suc n₁) o-one     = o-suc (add-even-odd n₁ o-one)
+add-even-odd (e-suc n₂) (o-suc m) = o-suc (add-even-odd n₂ (o-suc m))
+
+add-eo : Even-number → Odd-number → Odd-number
+add-eo (n₁ even-by n-even₁) (n₂ odd-by n-odd₂) = (n₁ + n₂) odd-by add-even-odd n-even₁ n-odd₂
