@@ -215,8 +215,8 @@ loem x = ⊥-elim (x (inj₂ (λ x₁ → x (inj₁ x₁))))
 -- その2点は同一であることを示してください。
 -- ==================================================================
 
-mh-id : ∀ p q → manhattan p q ≡ 0 → p ≡ q
-mh-id record { x = x₀ ; y = y₀ } record { x = x₁ ; y = y₁ } e = {!!}
++-zero : ∀ n m → n + m ≡ 0 → n ≡ 0 × m ≡ 0
++-zero = {!!}
 
 mh₀-id : ∀ p q → manhattan₀ p q ≡ 0 → p ≡ q
 mh₀-id zero zero _ = refl
@@ -224,7 +224,43 @@ mh₀-id zero (suc q) ()
 mh₀-id (suc p) zero ()
 mh₀-id (suc p) (suc q) e = cong suc (mh₀-id p q e)
 
+px≡py×qx≡qy→p≡q : ∀ {p q} → Point.x p ≡ Point.x q × Point.y p ≡ Point.y q → p ≡ q
+px≡py×qx≡qy→p≡q {record { x = _ ; y = _ }} {record { x = x ; y = y }} (refl , refl) = refl
+
+mh-id : ∀ p q → manhattan p q ≡ 0 → p ≡ q
+mh-id record { x = x₀ ; y = y₀ } record { x = x₁ ; y = y₁ } e =
+  {!!}
+  where
+    foo : manhattan₀ x₀ x₁ ≡ 0 × manhattan₀ y₀ y₁ ≡ 0
+    foo = +-zero (manhattan₀ x₀ x₁) (manhattan₀ y₀ y₁) e
+    bar : x₀ ≡ x₁
+    bar = mh₀-id x₀ x₁ (_×_.proj₁ foo)
+    buzz : y₀ ≡ y₁
+    buzz = mh₀-id y₀ y₁ (_×_.proj₂ foo)
+
+{-
+mh₀-id : ∀ p q → manhattan₀ p q ≡ 0 → p ≡ q
+mh₀-id zero zero _ = refl
+mh₀-id zero (suc q) ()
+mh₀-id (suc p) zero ()
+mh₀-id (suc p) (suc q) e = cong suc (mh₀-id p q e)
+
+y≡0→mhₓ≡0 : ∀ x₀ x₁ → manhattan record { x = x₀ ; y = zero } record { x = x₁ ; y = zero } ≡ 0 → manhattan₀ x₀ x₁ ≡ 0
+y≡0→mhₓ≡0 x₀ x₁ e = begin
+    manhattan₀ x₀ x₁
+  ≡⟨ {!x+0≡0→x≡0 e!} ⟩
+    0
+  ∎
+  where
+    open ≡-Reasoning
+    x+0≡0→x≡0 : ∀ x → x + zero ≡ zero → x ≡ 0
+    x+0≡0→x≡0 zero x₂ = refl
+    x+0≡0→x≡0 (suc x) ()
+
 mh0→mh₀0 : ∀ p q → manhattan p q ≡ 0 → manhattan₀ (Point.x p) (Point.x q) ≡ 0 × manhattan₀ (Point.y p) (Point.y q) ≡ 0
 mh0→mh₀0 record { x = zero ; y = zero } record { x = zero ; y = zero } e = refl , refl
-mh0→mh₀0 record { x = zero ; y = y₀ } record { x = x₁ ; y = y₁ } e = {!!}
-mh0→mh₀0 record { x = (suc x₀) ; y = y₀ } record { x = x₁ ; y = y₁ } e = {!!}
+mh0→mh₀0 record { x = zero ; y = y₀ } record { x = zero ; y = y₁ } e = refl , e
+mh0→mh₀0 record { x = x₀ ; y = zero } record { x = x₁ ; y = zero } e = y≡0→mhₓ≡0 x₀ x₁ e , refl
+mh0→mh₀0 record { x = (suc x₀) ; y = (suc y₀) } record { x = (suc x₁) ; y = (suc y₁) } e = {!!}
+mh0→mh₀0 _ _ ()
+-}
